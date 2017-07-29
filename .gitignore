@@ -1,0 +1,10 @@
+.cache/
+.tox/
+bin/
+Scripts/
+include/
+Include/
+lib/
+Lib/
+pip-selfcheck.json
+
