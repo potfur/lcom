@@ -3,7 +3,7 @@ import os
 from src.reflection import ModuleReflection
 
 
-class FileSystem:
+class FileSystem(object):
     def __init__(self, extension='py', separator='.'):
         self.__extension = extension
         self.__separator = separator
