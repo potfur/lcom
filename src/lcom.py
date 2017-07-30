@@ -3,16 +3,14 @@ from collections import defaultdict
 
 class LCOM4:
     def calculate(self, cls_ref):
-        paths = self.__access_paths(cls_ref)
+        paths = self.__call_paths(cls_ref)
 
-        groups = list()
-        for path in paths.values():
-            group = self.__find_matching_group(path, groups)
-            group |= path
+        groups = self.__match_groups(paths.values())
+        groups = self.__match_groups(groups)
 
         return len(groups)
 
-    def __access_paths(self, ref):
+    def __call_paths(self, ref):
         result = defaultdict(set)
         for method in ref.methods():
             if method.is_constructor():
@@ -33,6 +31,15 @@ class LCOM4:
 
         for call in method.calls():
             result |= self.__follow_call(ref, call)
+
+        return result
+
+    def __match_groups(self, groups):
+        result = list()
+
+        for group in groups:
+            match = self.__find_matching_group(group, result)
+            match |= group
 
         return result
 
