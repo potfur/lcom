@@ -7,7 +7,7 @@ class TestFileSystem(object):
 
     def test_find_scans_directory(self):
         result = self.fs.find('src/')
-        result = {repr(ref) for ref in result}
+        result = {ref.name() for ref in result}
 
         assert result == {
             'src/__init__.py',
@@ -18,7 +18,7 @@ class TestFileSystem(object):
 
     def test_find_can_filter_by_file_name(self):
         result = self.fs.find('src/', 'filesystem.py')
-        result = {repr(ref) for ref in result}
+        result = {ref.name() for ref in result}
 
         assert result == {
             'src/filesystem.py',
