@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 
-class LCOM4:
+class LCOM4(object):
     def calculate(self, cls_ref):
         paths = self.__call_paths(cls_ref)
 
