@@ -12,6 +12,7 @@ class TestFileSystem(object):
         assert result == {
             'src/__init__.py',
             'src/filesystem.py',
+            'src/lcom.py',
             'src/reflection.py'
         }
 
