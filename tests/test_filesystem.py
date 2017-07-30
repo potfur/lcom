@@ -1,7 +1,7 @@
 from src.filesystem import FileSystem
 
 
-class TestFileSystem:
+class TestFileSystem(object):
     def setup_method(self):
         self.fs = FileSystem()
 
