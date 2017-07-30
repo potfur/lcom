@@ -1,7 +1,7 @@
 import ast
 
 
-class ModuleReflection:
+class ModuleReflection(object):
     @classmethod
     def from_file(cls, file):
         with open(file, 'r') as handle:
@@ -28,7 +28,7 @@ class ModuleReflection:
         ]
 
 
-class ClassReflection:
+class ClassReflection(object):
     def __init__(self, node):
         self.__node = node
 
@@ -70,7 +70,7 @@ class ClassReflection:
         }
 
 
-class MethodReflection:
+class MethodReflection(object):
     def __init__(self, node):
         self.__node = node
 

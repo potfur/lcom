@@ -58,7 +58,7 @@ class TestModuleReflection(ReflectionTestCase):
 class TestClassReflection(ReflectionTestCase):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestClassReflection, cls).setup_class()
         cls.node = cls._find_node(
             cls.fixture,
             ast.ClassDef,
