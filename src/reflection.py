@@ -1,7 +1,16 @@
 import ast
+from abc import ABCMeta, abstractmethod
 
 
-class ModuleReflection(object):
+class Reflection(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def name(self):
+        raise NotImplementedError()
+
+
+class ModuleReflection(Reflection):
     @classmethod
     def from_file(cls, file):
         with open(file, 'r') as handle:
@@ -17,7 +26,7 @@ class ModuleReflection(object):
         self.__name = name
         self.__node = node
 
-    def __repr__(self):
+    def name(self):
         return self.__name
 
     def classes(self):
@@ -28,11 +37,11 @@ class ModuleReflection(object):
         ]
 
 
-class ClassReflection(object):
+class ClassReflection(Reflection):
     def __init__(self, node):
         self.__node = node
 
-    def __repr__(self):
+    def name(self):
         return self.__node.name
 
     def method(self, name):
@@ -70,11 +79,11 @@ class ClassReflection(object):
         }
 
 
-class MethodReflection(object):
+class MethodReflection(Reflection):
     def __init__(self, node):
         self.__node = node
 
-    def __repr__(self):
+    def name(self):
         return self.__node.name
 
     def is_constructor(self):

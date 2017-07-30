@@ -1,9 +1,18 @@
+from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 
-class LCOM4(object):
-    def calculate(self, cls_ref):
-        paths = self.__call_paths(cls_ref)
+class LCOMAlgorithm(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def calculate(self, ref):
+        raise NotImplementedError()
+
+
+class LCOM4(LCOMAlgorithm):
+    def calculate(self, ref):
+        paths = self.__call_paths(ref)
 
         groups = self.__match_groups(paths.values())
         groups = self.__match_groups(groups)
@@ -16,7 +25,7 @@ class LCOM4(object):
             if method.is_constructor():
                 continue
 
-            name = repr(method)
+            name = method.name()
             result[name] |= set([name] + method.vars())
             for call in method.calls():
                 result[name].add(call)

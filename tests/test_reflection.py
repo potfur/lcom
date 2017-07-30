@@ -42,16 +42,16 @@ class TestModuleReflection(ReflectionTestCase):
     def test_can_be_instantiated_from_file(self):
         ref = ModuleReflection.from_file('src/reflection.py')
 
-        assert repr(ref) == 'src/reflection.py'
+        assert ref.name() == 'src/reflection.py'
 
     def test_can_be_instantiated_from_string(self):
         ref = ModuleReflection.from_string('reflection', self.fixture)
-        assert repr(ref) == 'reflection'
+        assert ref.name() == 'reflection'
 
     def test_lists_classes(self):
         ref = ModuleReflection.from_string('reflection', self.fixture)
 
-        result = {repr(cls) for cls in ref.classes()}
+        result = {cls.name() for cls in ref.classes()}
         assert result == {'ModuleReflection'}
 
 
@@ -78,7 +78,7 @@ class TestClassReflection(ReflectionTestCase):
     def test_list_class_methods(self):
         ref = ClassReflection(self.node)
 
-        result = {repr(method) for method in ref.methods()}
+        result = {method.name() for method in ref.methods()}
         assert result == {
             'from_file',
             'from_string',
@@ -90,7 +90,7 @@ class TestClassReflection(ReflectionTestCase):
     def test_method_by_name(self):
         ref = ClassReflection(self.node)
 
-        assert repr(ref.method('from_file')) == 'from_file'
+        assert ref.method('from_file').name() == 'from_file'
 
 
 class TestMethodReflection(ReflectionTestCase):
