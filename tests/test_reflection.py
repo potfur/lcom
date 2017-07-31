@@ -1,6 +1,9 @@
 import ast
 
-from src.reflection import ModuleReflection, ClassReflection, MethodReflection
+from pytest import raises
+
+from src.reflection import ModuleReflection, ClassReflection, \
+    MethodReflection, ReflectionError
 from tests.conftest import LCOMTestCase
 
 
@@ -91,6 +94,15 @@ class TestClassReflection(ReflectionTestCase):
         ref = ClassReflection(self.node)
 
         assert ref.method('from_file').name() == 'from_file'
+
+    def test_unknown_method_by_name(self):
+        ref = ClassReflection(self.node)
+
+        with raises(ReflectionError) as e:
+            ref.method('foobar')
+
+        msg = 'Unknown method %s'
+        assert str(e.value) == msg % 'foobar'
 
 
 class TestMethodReflection(ReflectionTestCase):
