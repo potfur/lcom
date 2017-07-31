@@ -1,8 +1,32 @@
 import ast
 
-from src.lcom import LCOM4
-from src.reflection import ClassReflection
+from src.lcom import LCOMAggregate, LCOMAlgorithm, LCOM4
+from src.reflection import Reflection, ClassReflection
 from tests.conftest import LCOMTestCase
+
+
+class FakeLCOM(LCOMAlgorithm):
+    def __init__(self, results):
+        self.__results = results
+
+    def calculate(self, ref):
+        return self.__results.pop(0)
+
+
+class FakeReflection(Reflection):
+    def __init__(self, name):
+        self.__name = name
+
+    def name(self):
+        return self.__name
+
+
+class TestLCOMAggregate(object):
+    def test_calculates_lcom_for_each_ref(self):
+        result = LCOMAggregate(FakeLCOM([1])) \
+            .calculate([FakeReflection('ref.name')])
+
+        assert result == ({'ref.name': 1}, 1.0)
 
 
 class TestLCOM4(LCOMTestCase):
