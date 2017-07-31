@@ -2,6 +2,18 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 
+class LCOMAggregate(object):
+    def __init__(self, alg):
+        self.__alg = alg
+
+    def calculate(self, refs):
+        result = dict()
+        for ref in refs:
+            result[ref.name()] = self.__alg.calculate(ref)
+
+        return result, sum(result.values()) / len(result)
+
+
 class LCOMAlgorithm(object):
     __metaclass__ = ABCMeta
 
