@@ -47,10 +47,12 @@ class LCOM4(LCOMAlgorithm):
         return result
 
     def __follow_call(self, ref, name):
-        method = ref.method(name)
+        method = ref.method_by_name(name)
         result = set(method.vars() + method.calls())
 
         for call in method.calls():
+            if call == name:
+                continue
             result |= self.__follow_call(ref, call)
 
         return result

@@ -33,6 +33,12 @@ class ModuleReflection(Reflection):
     def name(self):
         return self.__name
 
+    def class_by_name(self, name):
+        for elem in self.classes():
+            if elem.name() == name:
+                return elem
+        raise ReflectionError('Unknown class %s' % name)
+
     def classes(self):
         return [
             ClassReflection(node)
@@ -48,27 +54,21 @@ class ClassReflection(Reflection):
     def name(self):
         return self.__node.name
 
-    def method(self, name):
-        nodes = [
-            node
-            for node in self.__node.body
-            if isinstance(node, ast.FunctionDef) and node.name == name
-        ]
+    def method_by_name(self, name):
+        for method in self.methods():
+            if method.name() == name:
+                return method
 
-        if not nodes:
-            raise ReflectionError('Unknown method %s' % name)
-
-        return MethodReflection(nodes[0])
+        raise ReflectionError('Unknown method %s' % name)
 
     def methods(self):
-        return [
-            MethodReflection(node)
-            for node in self.__node.body
-            if isinstance(node, ast.FunctionDef)
-        ]
+        return [MethodReflection(node) for node in self.__class_methods()]
 
     def vars(self):
-        return list(self.__class_vars() | self.__instance_vars())
+        result = self.__class_vars()
+        result |= self.__instance_vars()
+        result -= {node.name for node in self.__class_methods()}
+        return list(result)
 
     def __class_vars(self):
         return {
@@ -83,6 +83,13 @@ class ClassReflection(Reflection):
             node.attr
             for node in ast.walk(self.__node)
             if isinstance(node, ast.Attribute) and node.value.id == 'self'
+        }
+
+    def __class_methods(self):
+        return {
+            node
+            for node in self.__node.body
+            if isinstance(node, ast.FunctionDef)
         }
 
 
