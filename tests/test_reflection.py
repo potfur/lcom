@@ -1,105 +1,54 @@
-import ast
-
 from pytest import raises
 
-from src.reflection import ModuleReflection, ClassReflection, \
-    MethodReflection, ReflectionError
-from tests.conftest import LCOMTestCase
+from src.reflection import ModuleReflection, ReflectionError
 
 
-class ReflectionTestCase(LCOMTestCase):
+class ReflectionTestCase(object):
     @classmethod
     def setup_class(cls):
-        cls.fixture = '''
-class ModuleReflection:
-    EXTENSION = '.py'
-
-    @classmethod
-    def from_file(cls, file):
-        with open(file, 'r') as handle:
-            content = handle.read()
-
-        return cls.from_string(file.rstrip(cls.EXTENSION), content)
-
-    @classmethod
-    def from_string(cls, name, content):
-        return cls(name, ast.parse(content))
-
-    def __init__(self, name, node):
-        self.__name = name
-        self.__node = node
-
-    def __repr__(self):
-        return self.__name
-
-    def classes(self):
-        return [
-            ClassReflection(node)
-            for node in ast.walk(self.__node)
-            if isinstance(node, ast.ClassDef)
-        ]
-        '''
+        cls.module = ModuleReflection.from_file('./tests/fixtures.py')
 
 
 class TestModuleReflection(ReflectionTestCase):
-    def test_can_be_instantiated_from_file(self):
-        ref = ModuleReflection.from_file('src/reflection.py')
-
-        assert ref.name() == 'src/reflection.py'
-
-    def test_can_be_instantiated_from_string(self):
-        ref = ModuleReflection.from_string('reflection', self.fixture)
-        assert ref.name() == 'reflection'
-
     def test_lists_classes(self):
-        ref = ModuleReflection.from_string('reflection', self.fixture)
-
-        result = {cls.name() for cls in ref.classes()}
-        assert result == {'ModuleReflection'}
+        result = {cls.name() for cls in self.module.classes()}
+        assert result == {'Zero', 'One', 'Two', 'Three', 'Reflection'}
 
 
 class TestClassReflection(ReflectionTestCase):
-    @classmethod
-    def setup_class(cls):
-        super(TestClassReflection, cls).setup_class()
-        cls.node = cls._find_node(
-            cls.fixture,
-            ast.ClassDef,
-            ModuleReflection.__name__
-        )
-
     def test_list_variables(self):
-        ref = ClassReflection(self.node)
+        ref = self.module.class_by_name('Reflection')
 
         result = {var for var in ref.vars()}
         assert result == {
-            'EXTENSION',
-            '__name',
-            '__node'
+            'CONST',
+            '__x',
+            '__y'
         }
 
     def test_list_class_methods(self):
-        ref = ClassReflection(self.node)
+        ref = self.module.class_by_name('Reflection')
 
         result = {method.name() for method in ref.methods()}
         assert result == {
-            'from_file',
-            'from_string',
             '__init__',
-            '__repr__',
-            'classes'
+            'get_x',
+            'get_y',
+            'methods',
+            'vars',
+            'consts',
         }
 
     def test_method_by_name(self):
-        ref = ClassReflection(self.node)
+        ref = self.module.class_by_name('Reflection')
 
-        assert ref.method('from_file').name() == 'from_file'
+        assert ref.method_by_name('get_x').name() == 'get_x'
 
     def test_unknown_method_by_name(self):
-        ref = ClassReflection(self.node)
+        ref = self.module.class_by_name('Reflection')
 
         with raises(ReflectionError) as e:
-            ref.method('foobar')
+            ref.method_by_name('foobar')
 
         msg = 'Unknown method %s'
         assert str(e.value) == msg % 'foobar'
@@ -107,31 +56,31 @@ class TestClassReflection(ReflectionTestCase):
 
 class TestMethodReflection(ReflectionTestCase):
     def test_list_used_methods(self):
-        node = self._find_node(self.fixture, ast.FunctionDef, 'from_file')
-        ref = MethodReflection(node)
+        ref = self.module.class_by_name('Reflection') \
+            .method_by_name('methods')
 
-        assert set(ref.calls()) == {'from_string'}
+        assert set(ref.calls()) == {'get_x', 'get_y'}
 
     def test_list_used_class_variables(self):
-        node = self._find_node(self.fixture, ast.FunctionDef, 'from_file')
-        ref = MethodReflection(node)
+        ref = self.module.class_by_name('Reflection') \
+            .method_by_name('consts')
 
-        assert set(ref.vars()) == {'EXTENSION'}
+        assert set(ref.vars()) == {'CONST'}
 
     def test_list_used_instance_variables(self):
-        node = self._find_node(self.fixture, ast.FunctionDef, 'classes')
-        ref = MethodReflection(node)
+        ref = self.module.class_by_name('Reflection') \
+            .method_by_name('vars')
 
-        assert set(ref.vars()) == {'__node'}
+        assert set(ref.vars()) == {'__x', '__y'}
 
     def test_is_a_constructor(self):
-        node = self._find_node(self.fixture, ast.FunctionDef, '__init__')
-        ref = MethodReflection(node)
+        ref = self.module.class_by_name('Reflection') \
+            .method_by_name('__init__')
 
         assert ref.is_constructor() is True
 
     def test_is_not_a_constructor(self):
-        node = self._find_node(self.fixture, ast.FunctionDef, 'classes')
-        ref = MethodReflection(node)
+        ref = self.module.class_by_name('Reflection') \
+            .method_by_name('methods')
 
         assert ref.is_constructor() is False
