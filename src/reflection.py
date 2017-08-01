@@ -114,8 +114,8 @@ class MethodReflection(Reflection):
             node.attr
             for node in ast.walk(self.__node)
             if isinstance(node, ast.Attribute)
-               and hasattr(node.value, 'id')
-               and node.value.id in ('cls', 'self')
+            and hasattr(node.value, 'id')
+            and node.value.id in ('cls', 'self')
         }
 
     def __calls(self):
@@ -123,9 +123,9 @@ class MethodReflection(Reflection):
             node.func.attr
             for node in ast.walk(self.__node)
             if isinstance(node, ast.Call)
-               and isinstance(node.func, ast.Attribute)
-               and hasattr(node.func.value, 'id')
-               and node.func.value.id in ('cls', 'self')
+            and isinstance(node.func, ast.Attribute)
+            and hasattr(node.func.value, 'id')
+            and node.func.value.id in ('cls', 'self')
         }
 
     def __call_name(self, node):
