@@ -1,21 +1,15 @@
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-
-class LCOMAggregate(object):
-    def __init__(self, alg):
-        self.__alg = alg
-
-    def calculate(self, refs):
-        result = dict()
-        for ref in refs:
-            result[ref.name()] = self.__alg.calculate(ref)
-
-        return result, sum(result.values()) / len(result)
+from src.reflection import ReflectionError
 
 
 class LCOMAlgorithm(object):
     __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def name(self):
+        raise NotImplementedError()
 
     @abstractmethod
     def calculate(self, ref):
@@ -23,6 +17,9 @@ class LCOMAlgorithm(object):
 
 
 class LCOM4(LCOMAlgorithm):
+    def name(self):
+        return 'LCOM4'
+
     def calculate(self, ref):
         paths = self.__call_paths(ref)
 
@@ -47,7 +44,11 @@ class LCOM4(LCOMAlgorithm):
         return result
 
     def __follow_call(self, ref, name):
-        method = ref.method_by_name(name)
+        try:
+            method = ref.method_by_name(name)
+        except ReflectionError:
+            return set()
+
         result = set(method.vars() + method.calls())
 
         for call in method.calls():

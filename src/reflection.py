@@ -1,6 +1,8 @@
 import ast
 from abc import ABCMeta, abstractmethod
 
+import os
+
 
 class ReflectionError(Exception):
     pass
@@ -20,7 +22,16 @@ class ModuleReflection(Reflection):
         with open(file, 'r') as handle:
             content = handle.read()
 
-        return cls.from_string(file, content)
+        name = file.rsplit('.', 1)[0]
+        replacements = (
+            (os.path.sep, '.'),
+            ('__init__', ''),
+            ('__main__', ''),
+        )
+        for needle, replace in replacements:
+            name = name.replace(needle, replace)
+
+        return cls.from_string(name.strip('.'), content)
 
     @classmethod
     def from_string(cls, name, content):
@@ -41,28 +52,44 @@ class ModuleReflection(Reflection):
 
     def classes(self):
         return [
-            ClassReflection(node)
+            ClassReflection(self.__name, node)
             for node in ast.walk(self.__node)
             if isinstance(node, ast.ClassDef)
         ]
 
 
 class ClassReflection(Reflection):
-    def __init__(self, node):
+    def __init__(self, module_name, node):
+        self.__module_name = module_name
         self.__node = node
 
     def name(self):
-        return self.__node.name
+        return '%s.%s' % (
+            self.__module_name,
+            self.__node.name
+        )
 
     def method_by_name(self, name):
-        for method in self.methods():
-            if method.name() == name:
-                return method
+        nodes = [
+            node
+            for node in self.__class_methods()
+            if node.name == name
+        ]
 
-        raise ReflectionError('Unknown method %s' % name)
+        try:
+            return MethodReflection(
+                self.__module_name,
+                self.__node.name,
+                nodes[0]
+            )
+        except IndexError:
+            raise ReflectionError('Unknown method %s' % name)
 
     def methods(self):
-        return [MethodReflection(node) for node in self.__class_methods()]
+        return [
+            MethodReflection(self.__module_name, self.__node.name, node)
+            for node in self.__class_methods()
+        ]
 
     def vars(self):
         result = self.__class_vars()
@@ -94,11 +121,13 @@ class ClassReflection(Reflection):
 
 
 class MethodReflection(Reflection):
-    def __init__(self, node):
+    def __init__(self, module_name, class_name, node):
+        self.__module_name = module_name
+        self.__class_name = class_name
         self.__node = node
 
     def name(self):
-        return self.__node.name
+        return self.__call_name(self.__node.name)
 
     def is_constructor(self):
         return self.__node.name == '__init__'
@@ -120,7 +149,7 @@ class MethodReflection(Reflection):
 
     def __calls(self):
         return {
-            node.func.attr
+            self.__call_name(node.func.attr)
             for node in ast.walk(self.__node)
             if isinstance(node, ast.Call)
             and isinstance(node.func, ast.Attribute)
@@ -128,7 +157,9 @@ class MethodReflection(Reflection):
             and node.func.value.id in ('cls', 'self')
         }
 
-    def __call_name(self, node):
-        if isinstance(node.func, ast.Attribute):
-            return node.func.value.id
-        return node.func.id
+    def __call_name(self, node_name):
+        return '%s.%s::%s' % (
+            self.__module_name,
+            self.__class_name,
+            node_name
+        )
