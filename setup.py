@@ -22,9 +22,13 @@ setup(
         'lcom',
         'lcom4'
     ],
+    install_requires=[
+        'click'
+    ],
     test_suite='tests',
     tests_require=[
         'pytest',
+        'mock',
         'flake8',
     ],
     classifiers=[
@@ -35,4 +39,7 @@ setup(
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
     ],
+    entry_points={
+        'console_scripts': ['lcom=src.command:cmd'],
+    }
 )
