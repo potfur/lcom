@@ -13,16 +13,24 @@ class FileSystem(object):
         self.__separator = separator
 
     def find(self, path, filename=None):
+        if os.path.isfile(path):
+            return self.__find_in_file(path, filename)
+        return self.__find_in_directory(path, filename)
+
+    def __find_in_directory(self, path, filename=None):
         result = []
         for root, dirs, files in os.walk(path):
             for file in files:
-                file = os.path.join(root, file)
-                if not self.__has_extension(file):
-                    continue
-                if not self.__matches(file, filename):
-                    continue
-                result.append(ModuleReflection.from_file(file))
+                result += self.__find_in_file(
+                    os.path.join(root, file),
+                    filename
+                )
         return result
+
+    def __find_in_file(self, path, filename=None):
+        if self.__has_extension(path) and self.__matches(path, filename):
+            return [ModuleReflection.from_file(path)]
+        return []
 
     def __has_extension(self, file):
         return file.split(self.__separator)[-1] == self.__extension

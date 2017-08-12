@@ -52,6 +52,14 @@ class TestFileSystem(object):
     def setup_method(self):
         self.fs = FileSystem()
 
+    def test_find_scans_file(self):
+        result = self.fs.find('src/command.py')
+        result = {ref.name() for ref in result}
+
+        assert result == {
+            'src.command',
+        }
+
     def test_find_scans_directory(self):
         result = self.fs.find('src/')
         result = {ref.name() for ref in result}
