@@ -23,6 +23,27 @@ class One:
         return n * 2
 
 
+class DeepOne:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def a(self):
+        self.b()
+
+    def b(self):
+        self.c()
+
+    def c(self):
+        self.d()
+
+    def d(self):
+        self.e()
+
+    def e(self):
+        self.x = self.y
+
+
 class Two:
     def __init__(self, x, y):
         self.x = x

@@ -32,3 +32,9 @@ class TestLCOM4(LCOMTestCase):
         lcom = LCOM4().calculate(ref)
 
         assert lcom == 3
+
+    def test_calculate_for_deep(self):
+        ref = self.fixtures.class_by_name('tests.fixtures.DeepOne')
+        lcom = LCOM4().calculate(ref)
+
+        assert lcom == 1
