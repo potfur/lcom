@@ -15,6 +15,7 @@ class TestModuleReflection(ReflectionTestCase):
         assert result == {
             'tests.fixtures.Zero',
             'tests.fixtures.One',
+            'tests.fixtures.DeepOne',
             'tests.fixtures.Two',
             'tests.fixtures.Three',
             'tests.fixtures.Reflection'
