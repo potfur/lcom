@@ -1,3 +1,4 @@
+import os
 from mock import patch
 
 from src.command import FileSystem, STDOut, LCOMFactory, PrinterFactory, \
@@ -97,8 +98,20 @@ class TestSTDOutPrinter(object):
 
             STDOut().render('lcom0', [('Foo', 1)], 1.0)
 
-        expected = 'Calculating LCOM using lcom0\n  Foo : 1\nAverage: 1.00\n'
-        assert "".join(output) == expected
+        expected = [
+            '',
+            'Calculating LCOM using lcom0',
+            '+---------+------+',
+            '| Method  | LCOM |',
+            '+---------+------+',
+            '| Foo     | 1    |',
+            '+---------+------+',
+            '| Average | 1.00 |',
+            '+---------+------+',
+            ''
+        ]
+
+        assert "".join(output) == os.linesep.join(expected)
 
 
 class TestPrinterFactory(object):

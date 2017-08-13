@@ -23,7 +23,8 @@ setup(
         'lcom4'
     ],
     install_requires=[
-        'click'
+        'click',
+        'terminaltables'
     ],
     test_suite='tests',
     tests_require=[

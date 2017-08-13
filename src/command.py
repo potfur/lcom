@@ -2,6 +2,7 @@ import os
 from abc import ABCMeta, abstractmethod
 
 import click
+from terminaltables.ascii_table import AsciiTable
 
 from src.lcom import LCOM4
 from src.reflection import ModuleReflection
@@ -59,19 +60,17 @@ class Printer(object):
 
 class STDOut(Printer):
     def render(self, algorithm, classes, average):
-        padding = self.__padding(classes)
+        print('%sCalculating LCOM using %s' % (os.linesep, algorithm))
+
+        header = [('Method', 'LCOM')]
         classes = sorted(classes, key=lambda x: x[0])
+        summary = [('Average', "%.2f" % average)]
 
-        print('Calculating LCOM using %s' % algorithm)
-        for cls, result in classes:
-            print('  %s: %d' % (cls.ljust(padding), result))
-        print('Average: %.2f' % average)
+        table = AsciiTable(header + classes + summary)
+        table.inner_heading_row_border = True
+        table.inner_footing_row_border = True
 
-    def __padding(self, classes):
-        result = 0
-        for cls, _ in classes:
-            result = max(result, len(cls))
-        return result + 1
+        print(table.table)
 
 
 class PrinterFactory(object):
