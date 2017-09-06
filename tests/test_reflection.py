@@ -18,7 +18,8 @@ class TestModuleReflection(ReflectionTestCase):
             'tests.fixtures.DeepOne',
             'tests.fixtures.Two',
             'tests.fixtures.Three',
-            'tests.fixtures.Reflection'
+            'tests.fixtures.Loose',
+            'tests.fixtures.Reflection',
         }
 
 
@@ -37,6 +38,7 @@ class TestClassReflection(ReflectionTestCase):
     def test_list_class_methods(self):
         result = {method.name() for method in self.ref.methods()}
         assert result == {
+            'tests.fixtures.Reflection::decorated',
             'tests.fixtures.Reflection::__init__',
             'tests.fixtures.Reflection::get_x',
             'tests.fixtures.Reflection::get_y',
@@ -88,3 +90,14 @@ class TestMethodReflection(ReflectionTestCase):
         ref = self.ref.method_by_name('methods')
 
         assert ref.is_constructor() is False
+
+    def test_has_decorator(self):
+        ref = self.ref.method_by_name('decorated')
+
+        assert ref.has_decorator('classmethod') is True
+        assert ref.has_decorator('foobar') is False
+
+    def test_has_not_decorator(self):
+        ref = self.ref.method_by_name('methods')
+
+        assert ref.has_decorator('foo') is False
