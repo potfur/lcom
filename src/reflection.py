@@ -132,6 +132,15 @@ class MethodReflection(Reflection):
     def is_constructor(self):
         return self.__node.name == '__init__'
 
+    def has_decorator(self, decorator_name):
+        if not hasattr(self.__node, 'decorator_list'):
+            return False
+
+        for decorator in self.__node.decorator_list:
+            if decorator.id == decorator_name:
+                return True
+        return False
+
     def calls(self):
         return list(self.__calls())
 

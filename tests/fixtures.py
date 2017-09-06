@@ -81,8 +81,21 @@ class Three:
         return self.z
 
 
+class Loose:
+    @classmethod
+    def decorated(self, a, b):
+        return a + b
+
+    def loose_method(self, a, b):
+        return a + b
+
+
 class Reflection:
     CONST = 'const'
+
+    @classmethod
+    def decorated(cls, x, y):
+        return cls(x, y)
 
     def __init__(self, x, y):
         self.__x = x
