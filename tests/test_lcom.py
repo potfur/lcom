@@ -38,3 +38,9 @@ class TestLCOM4(LCOMTestCase):
         lcom = LCOM4().calculate(ref)
 
         assert lcom == 1
+
+    def test_calculate_for_loose(self):
+        ref = self.fixtures.class_by_name('tests.fixtures.Loose')
+        lcom = LCOM4().calculate(ref)
+
+        assert lcom == 0
