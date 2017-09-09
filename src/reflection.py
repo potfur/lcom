@@ -19,6 +19,7 @@ class Reflection(object):
 class ModuleReflection(Reflection):
     @classmethod
     def from_file(cls, file):
+        file = file.replace('/', os.path.sep).replace('\\', os.path.sep)
         with open(file, 'r') as handle:
             content = handle.read()
 
