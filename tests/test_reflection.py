@@ -42,6 +42,7 @@ class TestClassReflection(ReflectionTestCase):
             'tests.fixtures.Reflection::__init__',
             'tests.fixtures.Reflection::get_x',
             'tests.fixtures.Reflection::get_y',
+            'tests.fixtures.Reflection::loose',
             'tests.fixtures.Reflection::methods',
             'tests.fixtures.Reflection::vars',
             'tests.fixtures.Reflection::consts',
@@ -90,6 +91,16 @@ class TestMethodReflection(ReflectionTestCase):
         ref = self.ref.method_by_name('methods')
 
         assert ref.is_constructor() is False
+
+    def test_is_loose_method(self):
+        ref = self.ref.method_by_name('loose')
+
+        assert ref.is_loose() is True
+
+    def test_is_not_a_loose_method(self):
+        ref = self.ref.method_by_name('methods')
+
+        assert ref.is_loose() is False
 
     def test_has_decorator(self):
         ref = self.ref.method_by_name('decorated')
