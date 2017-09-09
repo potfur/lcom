@@ -31,18 +31,16 @@ class LCOM4(LCOMAlgorithm):
     def __call_paths(self, ref):
         result = defaultdict(set)
         for method in ref.methods():
-            if method.is_constructor() or method.has_decorator('classmethod'):
+            if any([
+                method.is_constructor(),
+                method.is_loose(),
+                method.has_decorator('classmethod')
+            ]):
                 continue
 
             name = method.name()
-            vars = method.vars()
-            calls = method.calls()
-
-            if not vars + calls:
-                continue
-
-            result[name] |= set([name] + vars)
-            for call in calls:
+            result[name] |= set([name] + method.vars())
+            for call in method.calls():
                 result[name].add(call)
                 result[call].add(name)
                 result[name] |= self.__follow_call(ref, call)

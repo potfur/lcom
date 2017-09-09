@@ -132,6 +132,9 @@ class MethodReflection(Reflection):
     def is_constructor(self):
         return self.__node.name == '__init__'
 
+    def is_loose(self):
+        return not (self.__calls() | self.__vars())
+
     def has_decorator(self, decorator_name):
         if not hasattr(self.__node, 'decorator_list'):
             return False
@@ -142,7 +145,10 @@ class MethodReflection(Reflection):
         return False
 
     def calls(self):
-        return list(self.__calls())
+        return [
+            self.__call_name(call)
+            for call in self.__calls()
+        ]
 
     def vars(self):
         return list(self.__vars() - self.__calls())
@@ -158,7 +164,7 @@ class MethodReflection(Reflection):
 
     def __calls(self):
         return {
-            self.__call_name(node.func.attr)
+            node.func.attr
             for node in ast.walk(self.__node)
             if isinstance(node, ast.Call)
             and isinstance(node.func, ast.Attribute)

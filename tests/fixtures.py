@@ -115,3 +115,6 @@ class Reflection:
 
     def consts(self):
         return self.CONST
+
+    def loose(self):
+        return 0
