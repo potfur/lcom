@@ -10,6 +10,14 @@ class ReflectionTestCase(object):
 
 
 class TestModuleReflection(ReflectionTestCase):
+    def test_filename_handles_slashes(self):
+        ref = ModuleReflection.from_file('./tests/fixtures.py')
+        assert ref.class_by_name('tests.fixtures.Reflection')
+
+    def test_filename_handles_backslashes(self):
+        ref = ModuleReflection.from_file('.\\tests\\fixtures.py')
+        assert ref.class_by_name('tests.fixtures.Reflection')
+
     def test_lists_classes(self):
         result = {cls.name() for cls in self.module.classes()}
         assert result == {
