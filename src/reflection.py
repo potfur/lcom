@@ -113,6 +113,7 @@ class ClassReflection(Reflection):
             if isinstance(node, ast.Attribute) and
             not isinstance(node.value, ast.Call) and
             not isinstance(node.value, ast.Attribute) and
+            not isinstance(node.value, ast.Str) and
             node.value.id == 'self'
         }
 
