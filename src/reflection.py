@@ -94,8 +94,8 @@ class ClassReflection(Reflection):
 
     def vars(self):
         result = self.__class_vars()
-        result |= self.__instance_vars()
-        result -= {node.name for node in self.__class_methods()}
+        result |= (self.__instance_vars() -
+                   {node.name for node in self.__class_methods()})
         return list(result)
 
     def __class_vars(self):
@@ -110,7 +110,11 @@ class ClassReflection(Reflection):
         return {
             node.attr
             for node in ast.walk(self.__node)
-            if isinstance(node, ast.Attribute) and node.value.id == 'self'
+            if isinstance(node, ast.Attribute) and
+            not isinstance(node.value, ast.Call) and
+            not isinstance(node.value, ast.Attribute) and
+            not isinstance(node.value, ast.Str) and
+            node.value.id == 'self'
         }
 
     def __class_methods(self):
@@ -141,7 +145,8 @@ class MethodReflection(Reflection):
             return False
 
         for decorator in self.__node.decorator_list:
-            if decorator.id == decorator_name:
+            if (hasattr(decorator, 'id') and
+               decorator.id == decorator_name):
                 return True
         return False
 
