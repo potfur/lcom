@@ -3,7 +3,7 @@ Lack of cohesion of methods
 ===========================
 
 **NOTE**: This fork of the original lcom code fixes a bug with the code crashing due to 
-`AttributeError: 'Call' object has no attribute 'id'`.
+``AttributeError: 'Call' object has no attribute 'id'``.
 
 Original README
 ===============
