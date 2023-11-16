@@ -2,6 +2,12 @@
 Lack of cohesion of methods
 ===========================
 
+**NOTE**: This fork of the original lcom code fixes a bug with the code crashing due to 
+`AttributeError: 'Call' object has no attribute 'id'`.
+
+Original README
+===============
+
 Cohesion metrics measure how well methods of a class are related to each other.
 A cohesive class has one responsibility. A non-cohesive class has more
 unrelated functions, thus more than one responsibility.
